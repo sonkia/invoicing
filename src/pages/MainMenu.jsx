@@ -39,8 +39,8 @@ export default class Sider extends React.Component {
   render() {
     const {path} = this.state;
     return (
-        <div style={{height: '100%'}}>
-            <div style={{ width: 256, height: '100%', float: 'left',backgroundColor:'#001529' }}>
+        <div style={{height: '100%',paddingLeft: 256}}>
+            <div style={{ marginLeft:-256,width: 256, height: '100%', float: 'left',backgroundColor:'#001529' }}>
                 <Menu
                     theme="dark"
                     mode="inline"
@@ -64,8 +64,8 @@ export default class Sider extends React.Component {
                 </Menu>
             </div>
 
-            <div style={{marginLeft:256,height: '100%' }}> 
-                {path === "second" ? <CommodityList></CommodityList> : <App></App>}
+            <div style={{height: '100%',width: '100%',float: 'right'}}> 
+                {path === "first" ? <CommodityList></CommodityList> : <App></App>}
             </div>
         </div>
       

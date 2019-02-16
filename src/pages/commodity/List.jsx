@@ -72,23 +72,18 @@ export default class App extends React.Component {
         };
         const hasSelected = selectedRowKeys.length > 0;
         return (
-            <div>
-                <Button
-                    type="primary"
-                    onClick={this.start}
-                    disabled={!hasSelected}
-                    loading={loading}
-                >
-                    Reload
-                </Button>
-                <Button
-                    type="primary"
-                    onClick={this.start}
-                    disabled={!hasSelected}
-                    loading={loading}
-                >
-                    Reload
-                </Button>
+            <div style={{marginLeft:10,marginRight:10,marginTop:10}}>
+                <div style={{marginBottom:10}}>
+                    <Button
+                        type="primary"
+                        onClick={this.start}
+                        disabled={!hasSelected}
+                        loading={loading}
+                    >
+                        Reload
+                    </Button>
+                </div>
+                
 
                 <Table rowKey={record => record.id} bordered={true} rowSelection={rowSelection} columns={columns} dataSource={dataList}/>
             </div>
