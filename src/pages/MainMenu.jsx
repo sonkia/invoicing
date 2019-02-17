@@ -1,7 +1,10 @@
 import React from 'react';
 import { Menu, Icon } from 'antd';
 import App from './App.js';
-import CommodityList from './commodity/List.jsx';
+import ProductList from './product/List.jsx';
+import ProductTypeList from './product_type/List.jsx';
+import Product from './product/Main';
+import ProductType from './product_type/Main';
 
 const SubMenu = Menu.SubMenu;
 
@@ -49,23 +52,22 @@ export default class Sider extends React.Component {
                     onClick={this.onClickMenu}
                     style={{ width: 256 }}
                 >
-                    <SubMenu key="sub1" title={<span><Icon type="appstore" /><span>Navigation One</span></span>}>
-                        <Menu.Item key="first">Option 1</Menu.Item>
-                        <Menu.Item key="second" >Option 2</Menu.Item>
+                    <SubMenu key="sub1" title={<span><Icon type="appstore" /><span>产品管理</span></span>}>
+                        <Menu.Item key="productList">产品列表</Menu.Item>
+                        <Menu.Item key="productType" >产品类型</Menu.Item>
                     </SubMenu>
-                    <SubMenu key="sub2" title={<span><Icon type="appstore" /><span>Navigation Two</span></span>}>
-                        <Menu.Item key="five" >Option 1</Menu.Item>
-                        <Menu.Item key="sex">Option 2</Menu.Item>
+                    <SubMenu key="sub2" title={<span><Icon type="appstore" /><span>进销存</span></span>}>
+                        <Menu.Item key="purchaseOrder" >进货单</Menu.Item>
+                        <Menu.Item key="saleOrder">销售单</Menu.Item>
                     </SubMenu>
-                    <SubMenu key="sub3" title={<span><Icon type="setting" /><span>Navigation Three</span></span>}>
-                        <Menu.Item key="nine" >Option 1</Menu.Item>
-                        <Menu.Item key="ten" >Option 2</Menu.Item>
+                    <SubMenu key="sub3" title={<span><Icon type="setting" /><span>设置</span></span>}>
+                        <Menu.Item key="nine" >设置</Menu.Item>
                     </SubMenu>
                 </Menu>
             </div>
 
             <div style={{height: '100%',width: '100%',float: 'right'}}> 
-                {path === "first" ? <CommodityList></CommodityList> : <App></App>}
+                {path === "productType" ? <ProductType></ProductType> : <Product></Product>}
             </div>
         </div>
       

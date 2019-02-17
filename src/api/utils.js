@@ -12,7 +12,7 @@ export const HEADER_AUTHORIZATION = {
 };
 
 const instance = axios.create({
-  baseURL: "http://localhost:8088/api",
+  baseURL: "http://localhost:8080/api",
   headers: Object.assign({}, HEADER_AUTHORIZATION),
   timeout: 10000,
 });

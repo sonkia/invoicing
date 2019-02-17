@@ -2,16 +2,25 @@ import React from 'react';
 import { Table, Button,message } from 'antd';
 import { concat } from 'lodash';
 import {
-        createDataset,
-        getDatasetList,
-    } from '../../api/dataset';
+        createdProduct,
+        getList,
+    } from '../../api/product';
 
 const columns = [{
-    title: 'Name',
+    title: '产品名称',
     dataIndex: 'name',
 }, {
-    title: 'Type',
-    dataIndex: 'type',
+    title: '产品编码',
+    dataIndex: 'code',
+}, {
+    title: '产品类型',
+    dataIndex: 'productType',
+}, {
+    title: '产品描述',
+    dataIndex: 'description',
+}, {
+    title: '整件单品数量',
+    dataIndex: 'unitCount',
 }];
 
 export default class App extends React.Component {
@@ -28,14 +37,18 @@ export default class App extends React.Component {
     }
 
     componentDidMount() {
-        this.getListData();
+        this.getListData(      {
+            condition:"",
+            pageSize: 20,
+            pageNo: 1,
+          });
     }
 
     // 获取列表数据
     getListData(params) {
         this.setState(
             () => {
-                getDatasetList(params)
+                getList(params)
                 .then(data => {
                     this.setState(({ dataList = [] }) => ({
                     dataList:concat(dataList, data.data),
@@ -83,8 +96,6 @@ export default class App extends React.Component {
                         Reload
                     </Button>
                 </div>
-                
-
                 <Table rowKey={record => record.id} bordered={true} rowSelection={rowSelection} columns={columns} dataSource={dataList}/>
             </div>
         );
