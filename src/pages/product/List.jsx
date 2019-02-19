@@ -1,10 +1,11 @@
 import React from 'react';
-import { Table, Button,message } from 'antd';
+import { Table, Button,message,Tooltip } from 'antd';
 import { concat } from 'lodash';
 import {
         createdProduct,
         getList,
     } from '../../api/product';
+import { Link } from 'react-router-dom';
 
 const columns = [{
     title: '产品名称',
@@ -94,6 +95,19 @@ export default class App extends React.Component {
                         loading={loading}
                     >
                         Reload
+                    </Button>
+                    <Button
+                        type="primary"
+                    >
+                        <Tooltip placement="bottom" title="新增">
+                            <Link
+                                to={{
+                                pathname: `new`,
+                                }}
+                            >
+                                新增
+                            </Link>
+                        </Tooltip>
                     </Button>
                 </div>
                 <Table rowKey={record => record.id} bordered={true} rowSelection={rowSelection} columns={columns} dataSource={dataList}/>

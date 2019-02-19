@@ -56,3 +56,24 @@ export const getList = (
       },
     })
   ).then(({ data }) => data || null);
+
+  /**
+ * 获取列表
+ * @param {string} name - 
+ * @param {string} id - 
+ * @param {*object} requestConfig - axios发起请求时的配置
+ * @returns {Promise(<object|null>)} - 返回列表数据及分页数据
+ */
+export const checkProductNameExisted = (  
+  { name = '', id = '' },
+  requestConfig = {}
+) =>
+  API.get(
+    'invoicing/product/name/repeat',
+    merge(requestConfig, {
+      params: {
+        name,
+        id,
+      },
+    })
+  ).then(({ data }) => data || null);
