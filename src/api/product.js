@@ -56,6 +56,13 @@ export const getList = (
       },
     })
   ).then(({ data }) => data || null);
+ 
+  export const deleteProduct = (id = '', requestConfig = {}) =>
+    API.delete(
+      // url
+      `invoicing/product/${id}`,
+      requestConfig,
+    ).then(({ data }) => data || null);
 
   /**
  * 获取列表
