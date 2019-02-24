@@ -10,6 +10,7 @@ import API from './utils.js';
  */
 export const createProductType = (
   {
+    id,
     name,
     code,
     description,
@@ -21,6 +22,7 @@ export const createProductType = (
     'invoicing/product/type',
     // data
     {
+      id,
       name,
       code,
       description,
@@ -96,3 +98,30 @@ export const checkProductTypeCodeExisted = (
       },
     })
   ).then(({ data }) => data || null);
+
+
+
+export const getProductTypes = (  
+  requestConfig = {}
+) =>
+  API.get(
+    'invoicing/product/type/names',
+    requestConfig,
+  ).then(({ data }) => data || null);
+
+export const queryById = (
+  id = '', 
+  requestConfig = {}
+  ) => 
+  API.get(
+    // url
+    `invoicing/product/type/${id}`,
+    requestConfig,
+  ).then(({ data }) => data || null);
+
+export const deleteProductType = (id = '', requestConfig = {}) =>
+API.delete(
+  // url
+  `invoicing/product/type/${id}`,
+  requestConfig,
+).then(({ data }) => data || null);

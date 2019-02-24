@@ -52,9 +52,9 @@ export default class Sider extends React.Component {
                     onClick={this.onClickMenu}
                     style={{ width: 256 }}
                 >
-                    <SubMenu key="sub1" title={<span><Icon type="appstore" /><span>产品管理</span></span>}>
-                        <Menu.Item key="productList">产品列表</Menu.Item>
-                        <Menu.Item key="productType" >产品类型</Menu.Item>
+                    <SubMenu key="sub1" title={<span><Icon type="appstore" /><span>商品管理</span></span>}>
+                        <Menu.Item key="productList">商品列表</Menu.Item>
+                        <Menu.Item key="productType" >商品类型</Menu.Item>
                     </SubMenu>
                     <SubMenu key="sub2" title={<span><Icon type="appstore" /><span>进销存</span></span>}>
                         <Menu.Item key="purchaseOrder" >进货单</Menu.Item>

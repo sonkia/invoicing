@@ -10,6 +10,7 @@ import API from './utils.js';
  */
 export const createProduct = (
   {
+    id,
     name,
     code,
     productType,
@@ -23,6 +24,7 @@ export const createProduct = (
     'invoicing/product',
     // data
     {
+      id,
       name,
       code,
       productType,
@@ -56,6 +58,16 @@ export const getList = (
       },
     })
   ).then(({ data }) => data || null);
+
+  export const queryById = (
+    id = '', 
+    requestConfig = {}
+    ) => 
+    API.get(
+      // url
+      `invoicing/product/${id}`,
+      requestConfig,
+    ).then(({ data }) => data || null);
  
   export const deleteProduct = (id = '', requestConfig = {}) =>
     API.delete(
@@ -80,6 +92,20 @@ export const checkProductNameExisted = (
     merge(requestConfig, {
       params: {
         name,
+        id,
+      },
+    })
+  ).then(({ data }) => data || null);
+
+export const checkProductCodeExisted = (  
+  { code = '', id = '' },
+  requestConfig = {}
+) =>
+  API.get(
+    'invoicing/product/code/repeat',
+    merge(requestConfig, {
+      params: {
+        code,
         id,
       },
     })

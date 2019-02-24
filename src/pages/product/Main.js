@@ -15,7 +15,7 @@ const Main = () => (
     <div>
       <Route exact path="/" component={ProcductList} />
       <Route path="/new" component={New} />
-      <Route path="/edit/:id" component={ProcductList} />
+      <Route path="/edit/:id" component={New} />
     </div>
   </BrowserRouter>
 );

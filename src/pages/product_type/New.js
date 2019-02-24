@@ -1,15 +1,16 @@
 /**
- * 产品类型管理 - 新建
+ * 商品类型管理 - 新建
  */
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input,message } from 'antd';
 import { Link } from 'react-router-dom';
 import {
   createProductType,
   checkProductTypeNameExisted,
   checkProductTypeCodeExisted,
+  queryById,
 } from '../../api/product_type';
 
 const FormItem = Form.Item;
@@ -40,17 +41,48 @@ class New extends React.Component {
         super(props);
 
     this.state = {
+      titleName:"新建商品类型",
       nameValVisable: false, // 修改：实验名称校验放提交后
+      codeValVisable: false,
       nameVal: '', // 修改：实验名称校验放提交后
+      codeVal:'',
+      descriptionVal:'',
+      id:null,
       submitBtnLoading: false, // 确认提交按钮状态切换
     };
 
-    this.validFunction = this.validFunction.bind(this);
+    this.validNameFunction = this.validNameFunction.bind(this);
+    this.validCodeFunction = this.validCodeFunction.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.getProductTypeById = this.getProductTypeById.bind(this);
+  }
+
+  componentDidMount() {
+    const { id } = this.props.match.params;
+    if(id){
+      this.getProductTypeById(id);
+    }
+  }
+
+  getProductTypeById(id){
+    queryById(id)
+      .then(data => {
+        this.setState({
+          id:id,
+          nameVal: "" + data.data.name,
+          codeVal: "" + data.data.code,
+          descriptionVal: data.data.description,
+          titleName:"修改商品类型",
+        });
+      })
+      .catch(error => {
+        alert(error);
+        console.error(error);
+      });
   }
 
   // 判断实验名称是否重复
-  validFunction(rule, value, callback){
+  validNameFunction(rule, value, callback){
     // 修改：实验名称校验放提交后
     const { nameVal } = this.state;
     if (value !== nameVal) {
@@ -61,10 +93,19 @@ class New extends React.Component {
     }
   };
 
+  // 判断实验code是否重复
+  validCodeFunction(rule, value, callback){
+    const { codeVal } = this.state;
+    if (value !== codeVal) {
+      this.setState({
+        codeValVisable: false,
+      });
+      callback();
+    }
+  };
+
   // 提交
   handleSubmit(e){
-    // 修改：实验名称校验放提交后
-    e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
         this.setState(
@@ -72,36 +113,61 @@ class New extends React.Component {
             submitBtnLoading: true,
           },
           () => {
-            checkProductTypeNameExisted({
-              name: values.name,
-            })
-              .then(data => {
+            let nameCheckParams = {name: values.name,};
+            let codeCheckParams = {code: values.code,};
+            if(this.state.id){
+              nameCheckParams = {
+                name: values.name,
+                id:this.state.id
+              };
+              codeCheckParams = {
+                code: values.code,
+                id:this.state.id
+              };
+            }
+            checkProductTypeNameExisted(nameCheckParams).then(data => {
                 if (data.data === true) {
-                  // callback('该实验名称已存在,请重新输入');
+                  message.error("商品类型名称已存在,请重新输入");
                   this.setState({
                     nameValVisable: true,
                     nameVal: values.name,
                     submitBtnLoading: false,
                   });
                 } else {
-                  createProductType({
-                    name: values.name,
-                    code: values.code,
-                    description: values.description,
-                  })
-                    .then(data1 => {
-                      this.setState({
-                        submitBtnLoading: false,
+                    checkProductTypeCodeExisted(codeCheckParams).then(data => {
+                        if (data.data === true) {
+                          message.error("商品类型编码已存在,请重新输入");
+                          alert(1);
+                          this.setState({
+                            codeValVisable: true,
+                            codeVal: values.code,
+                            submitBtnLoading: false,
+                          });
+                        } else {
+                          createProductType({
+                            id:this.state.id,
+                            name: values.name,
+                            code: values.code,
+                            description: values.description,
+                          }).then(data1 => {
+                              this.setState({
+                                submitBtnLoading: false,
+                              });
+                              const { history } = this.props;
+                              history.push(``);
+                            }).catch(error => {
+                              this.setState({
+                                submitBtnLoading: false,
+                              });
+                              console.error(error);
+                            });
+                        }
+                      }).catch(error => {
+                        this.setState({
+                          submitBtnLoading: false,
+                        });
+                        console.error(error);
                       });
-                      const { history } = this.props;
-                      history.push(``);
-                    })
-                    .catch(error => {
-                      this.setState({
-                        submitBtnLoading: false,
-                      });
-                      console.error(error);
-                    });
                 }
               })
               .catch(error => {
@@ -118,80 +184,65 @@ class New extends React.Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    console.log('0000' + getFieldDecorator);
-    const { nameValVisable, submitBtnLoading } = this.state;
+    const { nameValVisable, 
+      codeValVisable,
+      submitBtnLoading,
+      nameVal,
+      codeVal,
+      descriptionVal,
+      titleName } = this.state;
     return (
       <div>
-        <h2 style={{textAlign:"center"}}>新建产品类型</h2>
+        <h2 style={{textAlign:"center"}}>{titleName}</h2>
         <Form>
-          <FormItem {...formItemLayout} label="产品类型名称">
+          <FormItem {...formItemLayout} label="商品类型名称">
             {getFieldDecorator('name', {
+              initialValue: nameVal,
               rules: [
                 {
                   required: true,
-                  message: '名称不能为空',
+                  message: '商品类型名称不能为空',
                 },
                 {
                   pattern: /^[A-Za-z0-9\u4e00-\u9fa5]+$/,
                   message: '仅允许输入中英文、数字',
-                },
-                {
-                  validator: this.validFunction,
                 },
               ],
             })(
               // 修改：实验名称校验放提交后
-              <div>
-                <Input
-                  placeholder="请输入产品类型名称"
+              <Input
+                  placeholder="请输入商品类型名称"
                   maxLength={50}
                 />
-                {nameValVisable ? (
-                  <div>
-                    该名称已存在,请重新输入{' '}
-                  </div>
-                ) : (
-                  ''
-                )}
-              </div>
             )}
           </FormItem>
-          <FormItem {...formItemLayout} label="产品类型编码">
+          <FormItem {...formItemLayout} label="商品类型编码">
             {getFieldDecorator('code', {
+              initialValue: codeVal,
               rules: [
                 {
                   required: true,
-                  message: '编码不能为空',
+                  message: '商品类型编码不能为空',
                 },
                 {
-                  pattern: /^[A-Za-z0-9\u4e00-\u9fa5]+$/,
-                  message: '仅允许输入中英文、数字',
-                },
-                {
-                  validator: this.validFunction,
+                  pattern: /^[A-Za-z0-9]+$/,
+                  message: '仅允许输入英文、数字',
                 },
               ],
             })(
-              <div>
-                <Input
-                  placeholder="请输入编码"
+              <Input
+                  placeholder="请输入商品类型编码"
                   maxLength={50}
                 />
-                {nameValVisable ? (
-                  <div>
-                    该编码已存在,请重新输入{' '}
-                  </div>
-                ) : (
-                  ''
-                )}
-              </div>
             )}
           </FormItem>
-          <FormItem {...formItemLayout} label="产品类型描述">
-            {getFieldDecorator('description', {})(
+          <FormItem {...formItemLayout} label="商品类型描述">
+            {getFieldDecorator('description', {
+              initialValue: descriptionVal,
+            })(
               <TextArea
                 rows={4}
-                placeholder="请输入描述"
+                placeholder="请输入商品类型描述"
                 maxLength={500}
                 style={{ resize: 'none' }}
                 autosize

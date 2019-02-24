@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Button,Modal,message,Tooltip,Icon } from 'antd';
+import { Table, Button,Modal,message,Tooltip,Icon,Input } from 'antd';
 import { concat } from 'lodash';
 import {
         createdProduct,
@@ -9,10 +9,14 @@ import {
 import { Link } from 'react-router-dom';
 
 
+const { Search } = Input;
+
 export default class App extends React.Component {
     constructor(props){
         super(props);
         this.state = {
+            current:1,
+            total:0,
             deleteModalVisible: false, // 删除遮罩状态
             deleteIsSelected: false, // 是否为批量删除
             deleteModalShowId: '', // 打开遮罩层上面显示的此条数据的id
@@ -28,16 +32,43 @@ export default class App extends React.Component {
         this.setDeleteVisibleSure = this.setDeleteVisibleSure.bind(this);
         this.setDeleteVisibleCancel = this.setDeleteVisibleCancel.bind(this);
         this.initData = this.initData.bind(this);
+        this.changePage = this.changePage.bind(this);
+        this.searchKeyword = this.searchKeyword.bind(this);
     }
 
     componentDidMount() {
-        this.initData();
+        this.initData("");
     }
 
-    initData(){
-        this.getListData(      {
+    changePage(page) {
+        this.setState({
+          current: page,
+        }, () => {
+          this.getListData({
             condition:"",
-            pageSize: 20,
+            pageNo: this.state.current,
+            pageSize: 10,
+          })
+        })
+      }
+
+    // 条件查询
+    searchKeyword(value) {
+        this.setState(
+        {
+            selectedRowKeys: [],
+        },
+        () => {
+            this.initData(value);
+        }
+        );
+    }
+
+
+    initData(value){
+        this.getListData(      {
+            condition:value,
+            pageSize: 10,
             pageNo: 1,
           });
     }
@@ -75,7 +106,7 @@ export default class App extends React.Component {
                     getSampleSetListPage: 1,
                     getSampleSetListTotalPage: 0,
                 },
-                () => this.initData()
+                () => this.initData("")
                 );
                 message.success('删除成功!');
                 <Link to={{ pathname: `new`, }}>新增</Link>
@@ -121,7 +152,9 @@ export default class App extends React.Component {
                 getList(params)
                 .then(data => {
                     this.setState(({ dataList = [] }) => ({
-                    dataList:data.data,
+                        dataList:data.data,
+                        current:data.option.pageNo,
+                        total:data.option.total,
                     }));
                 })
                 .catch(error => {
@@ -148,17 +181,25 @@ export default class App extends React.Component {
     }
 
     render() {
+
+        const { dataList,loading, selectedRowKeys,
+            deleteModalVisible, // 删除遮罩状态
+            deleteIsSelected, // 是否为批量删除
+            deleteModalShowId, // 打开遮罩层上面显示的此条数据的id
+            deleteBtnSureLoading,
+        } = this.state;
+
         const columns = [{
-            title: '产品名称',
+            title: '商品名称',
             dataIndex: 'name',
         }, {
-            title: '产品编码',
+            title: '商品编码',
             dataIndex: 'code',
         }, {
-            title: '产品类型',
+            title: '商品类型',
             dataIndex: 'productType',
         }, {
-            title: '产品描述',
+            title: '商品描述',
             dataIndex: 'description',
         }, {
             title: '整件单品数量',
@@ -167,6 +208,7 @@ export default class App extends React.Component {
             title: '操作',
             dataIndex: 'operation',
             key: 'operation',
+            width: 200,
             render: (text, record) => (
               <div>
                 <Icon
@@ -174,7 +216,7 @@ export default class App extends React.Component {
                     onClick={e => {
                         e.stopPropagation();
                         // 跳转至建模
-                        this.props.history.push(`/new`);
+                        this.props.history.push(`/edit/${record.id}`);
                     }}
                     title="编辑"
                 />
@@ -188,12 +230,7 @@ export default class App extends React.Component {
             ),
           }];
         
-        const { dataList,loading, selectedRowKeys,
-            deleteModalVisible, // 删除遮罩状态
-            deleteIsSelected, // 是否为批量删除
-            deleteModalShowId, // 打开遮罩层上面显示的此条数据的id
-            deleteBtnSureLoading,
-        } = this.state;
+
         const rowSelection = {
             selectedRowKeys,
             onChange: this.onSelectChange,
@@ -201,16 +238,14 @@ export default class App extends React.Component {
         const hasSelected = selectedRowKeys.length > 0;
         return (
             <div style={{marginLeft:10,marginRight:10,marginTop:10}}>
-                <div style={{marginBottom:10}}>
+                <Search
+                        placeholder="请输入名称、编码或类型"
+                        onSearch={value => this.searchKeyword(value)}
+                        style={{margin:10,width:"200px"}}
+                    />
+                <div style={{margin:10,textAlign:"right",float:"right"}}>
                     <Button
-                        type="primary"
-                        onClick={this.start}
-                        disabled={!hasSelected}
-                        loading={loading}
-                    >
-                        Reload
-                    </Button>
-                    <Button
+                        style={{marginRight:20}}
                         type="primary"
                     >
                         <Tooltip placement="bottom" title="新增">
@@ -218,7 +253,15 @@ export default class App extends React.Component {
                         </Tooltip>
                     </Button>
                 </div>
-                <Table style={{textAlign:"center"}} rowKey={record => record.id} bordered={true} rowSelection={rowSelection} columns={columns} dataSource={dataList}/>
+                <Table 
+                    pagination={{  // 分页
+                        simple: false,
+                        pageSize:10,
+                        current: this.state.current,
+                        total: this.state.total,
+                        onChange: this.changePage,
+                        }}
+                    style={{textAlign:"center"}} rowKey={record => record.id} bordered={true} rowSelection={rowSelection} columns={columns} dataSource={dataList}/>
                 <Modal
                     title="提示"
                     wrapClassName="vertical-center-modal"
